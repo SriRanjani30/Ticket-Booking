@@ -56,6 +56,23 @@
         button:hover {
             background-color: #555;
         }
+        .seat-selection {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .seat {
+            padding: 10px;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            text-align: center;
+            cursor: pointer;
+        }
+        .seat.selected {
+            background-color: #333;
+            color: #fff;
+        }
         .receipt {
             display: none;
             margin-top: 20px;
@@ -124,8 +141,20 @@
             <option value="sports">Sports</option>
         </select>
 
+        <label for="time">Time:</label>
+        <select id="time" name="time" required>
+            <option value="18:00">18:00</option>
+            <option value="20:00">20:00</option>
+            <option value="22:00">22:00</option>
+        </select>
+
         <label for="tickets">Number of Tickets:</label>
         <input type="number" id="tickets" name="tickets" min="1" required>
+
+        <label for="seats">Select Seats:</label>
+        <div class="seat-selection" id="seatSelection">
+            <!-- Seats will be dynamically generated here -->
+        </div>
 
         <label for="payment">Payment Method:</label>
         <select id="payment" name="payment" required>
@@ -133,6 +162,8 @@
             <option value="paypal">PayPal</option>
             <option value="crypto">Cryptocurrency</option>
         </select>
+
+        <p><strong>Total Cost:</strong> $<span id="totalCost">0</span></p>
 
         <button type="button" onclick="showModal()">Book Now</button>
     </form>
@@ -142,7 +173,9 @@
         <p><strong>Name:</strong> <span id="receiptName"></span></p>
         <p><strong>Email:</strong> <span id="receiptEmail"></span></p>
         <p><strong>Event:</strong> <span id="receiptEvent"></span></p>
+        <p><strong>Time:</strong> <span id="receiptTime"></span></p>
         <p><strong>Number of Tickets:</strong> <span id="receiptTickets"></span></p>
+        <p><strong>Seats:</strong> <span id="receiptSeats"></span></p>
         <p><strong>Payment Method:</strong> <span id="receiptPayment"></span></p>
         <p><strong>Total Cost:</strong> $<span id="receiptCost"></span></p>
     </div>
@@ -158,6 +191,19 @@
 </div>
 
 <script>
+    // Generate seat options
+    const seatSelection = document.getElementById('seatSelection');
+    for (let i = 1; i <= 25; i++) {
+        const seat = document.createElement('div');
+        seat.className = 'seat';
+        seat.innerText = i;
+        seat.onclick = function() {
+            this.classList.toggle('selected');
+            calculateTotalCost();
+        };
+        seatSelection.appendChild(seat);
+    }
+
     function showModal() {
         document.getElementById('myModal').style.display = 'block';
     }
@@ -166,27 +212,40 @@
         document.getElementById('myModal').style.display = 'none';
     }
 
+    function calculateTotalCost() {
+        const tickets = document.getElementById('tickets').value;
+        const selectedSeats = document.querySelectorAll('.seat.selected').length;
+        const cost = tickets * 20 + selectedSeats * 5; // $20 per ticket + $5 per selected seat
+        document.getElementById('totalCost').innerText = cost;
+    }
+
     function bookTicket() {
         const name = document.getElementById('name').value;
         const email = document.getElementById('email').value;
         const event = document.getElementById('event').value;
+        const time = document.getElementById('time').value;
         const tickets = document.getElementById('tickets').value;
+        const selectedSeats = Array.from(document.querySelectorAll('.seat.selected')).map(seat => seat.innerText);
         const payment = document.getElementById('payment').value;
 
-        // Calculate total cost (example: $20 per ticket)
-        const cost = tickets * 20;
+        // Calculate total cost
+        const cost = tickets * 20 + selectedSeats.length * 5;
 
         // Display receipt
         document.getElementById('receiptName').innerText = name;
         document.getElementById('receiptEmail').innerText = email;
         document.getElementById('receiptEvent').innerText = event;
+        document.getElementById('receiptTime').innerText = time;
         document.getElementById('receiptTickets').innerText = tickets;
+        document.getElementById('receiptSeats').innerText = selectedSeats.join(', ');
         document.getElementById('receiptPayment').innerText = payment;
         document.getElementById('receiptCost').innerText = cost;
 
         document.getElementById('receipt').style.display = 'block';
         closeModal();
     }
+
+    document.getElementById('tickets').addEventListener('input', calculateTotalCost);
 
     window.onclick = function(event) {
         const modal = document.getElementById('myModal');
