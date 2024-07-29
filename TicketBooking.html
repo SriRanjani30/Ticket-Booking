@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ticket Booking App</title>
+    <title>Advanced Ticket Booking App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM0zMykp4Rf5KTeVlNpFblhl/7X9+49kwT4qvVt" crossorigin="anonymous">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,7 +29,7 @@
             color: black;
         }
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 50px auto;
             background: #fff;
             padding: 20px;
@@ -36,6 +37,12 @@
         }
         h1, h2 {
             text-align: center;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
         }
         label {
             display: block;
@@ -72,6 +79,10 @@
         .seat.selected {
             background-color: #333;
             color: #fff;
+        }
+        .seat.occupied {
+            background-color: #888;
+            cursor: not-allowed;
         }
         .receipt {
             display: none;
@@ -127,46 +138,66 @@
 
 <div class="container">
     <h1>Book Your Ticket</h1>
-    <form id="bookingForm">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
+    <div class="step active" id="step1">
+        <h2>Step 1: Enter Personal Details</h2>
+        <form id="personalDetailsForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
 
-        <label for="event">Event:</label>
-        <select id="event" name="event" required>
-            <option value="concert">Concert</option>
-            <option value="theater">Theater</option>
-            <option value="sports">Sports</option>
-        </select>
+            <button type="button" onclick="goToStep2()">Next</button>
+        </form>
+    </div>
 
-        <label for="time">Time:</label>
-        <select id="time" name="time" required>
-            <option value="18:00">18:00</option>
-            <option value="20:00">20:00</option>
-            <option value="22:00">22:00</option>
-        </select>
+    <div class="step" id="step2">
+        <h2>Step 2: Select Event and Time</h2>
+        <form id="eventDetailsForm">
+            <label for="event">Event:</label>
+            <select id="event" name="event" required>
+                <option value="concert">Concert</option>
+                <option value="theater">Theater</option>
+                <option value="sports">Sports</option>
+            </select>
 
-        <label for="tickets">Number of Tickets:</label>
-        <input type="number" id="tickets" name="tickets" min="1" required>
+            <label for="time">Time:</label>
+            <select id="time" name="time" required>
+                <option value="18:00">18:00</option>
+                <option value="20:00">20:00</option>
+                <option value="22:00">22:00</option>
+            </select>
 
-        <label for="seats">Select Seats:</label>
+            <button type="button" onclick="goToStep3()">Next</button>
+        </form>
+    </div>
+
+    <div class="step" id="step3">
+        <h2>Step 3: Select Seats</h2>
         <div class="seat-selection" id="seatSelection">
             <!-- Seats will be dynamically generated here -->
         </div>
+        <button type="button" onclick="goToStep4()">Next</button>
+    </div>
 
-        <label for="payment">Payment Method:</label>
-        <select id="payment" name="payment" required>
-            <option value="credit">Credit Card</option>
-            <option value="paypal">PayPal</option>
-            <option value="crypto">Cryptocurrency</option>
-        </select>
+    <div class="step" id="step4">
+        <h2>Step 4: Payment and Confirmation</h2>
+        <form id="paymentDetailsForm">
+            <label for="tickets">Number of Tickets:</label>
+            <input type="number" id="tickets" name="tickets" min="1" required oninput="calculateTotalCost()">
 
-        <p><strong>Total Cost:</strong> $<span id="totalCost">0</span></p>
+            <label for="payment">Payment Method:</label>
+            <select id="payment" name="payment" required>
+                <option value="credit">Credit Card</option>
+                <option value="paypal">PayPal</option>
+                <option value="crypto">Cryptocurrency</option>
+            </select>
 
-        <button type="button" onclick="showModal()">Book Now</button>
-    </form>
+            <p><strong>Total Cost:</strong> $<span id="totalCost">0</span></p>
+
+            <button type="button" onclick="showModal()">Book Now</button>
+        </form>
+    </div>
 
     <div class="receipt" id="receipt">
         <h2>Booking Receipt</h2>
@@ -198,8 +229,10 @@
         seat.className = 'seat';
         seat.innerText = i;
         seat.onclick = function() {
-            this.classList.toggle('selected');
-            calculateTotalCost();
+            if (!this.classList.contains('occupied')) {
+                this.classList.toggle('selected');
+                calculateTotalCost();
+            }
         };
         seatSelection.appendChild(seat);
     }
@@ -245,7 +278,20 @@
         closeModal();
     }
 
-    document.getElementById('tickets').addEventListener('input', calculateTotalCost);
+    function goToStep2() {
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step2').classList.add('active');
+    }
+
+    function goToStep3() {
+        document.getElementById('step2').classList.remove('active');
+        document.getElementById('step3').classList.add('active');
+    }
+
+    function goToStep4() {
+        document.getElementById('step3').classList.remove('active');
+        document.getElementById('step4').classList.add('active');
+    }
 
     window.onclick = function(event) {
         const modal = document.getElementById('myModal');
