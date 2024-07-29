@@ -93,14 +93,6 @@
             background-color: #888;
             cursor: not-allowed;
         }
-        .receipt {
-            display: none;
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            padding: 15px;
-            border-radius: 5px;
-            background: #e9ffe9;
-        }
         .modal {
             display: none;
             position: fixed;
@@ -143,6 +135,19 @@
             width: auto;
             margin: 5px;
         }
+        .contact-info, .event-details {
+            margin: 20px 0;
+        }
+        .contact-info h2, .event-details h2 {
+            margin-bottom: 10px;
+        }
+        .receipt-details {
+            margin-top: 10px;
+        }
+        .print-button {
+            margin-top: 20px;
+            background-color: #28a745;
+        }
     </style>
 </head>
 <body>
@@ -162,14 +167,38 @@
 
 <div class="container" id="events" style="display: none;">
     <h1>Events</h1>
-    <p>List of available events.</p>
-    <!-- Add event details here -->
+    <div class="event-details">
+        <h2>Concert</h2>
+        <p>Date: 2024-08-15</p>
+        <p>Time: 18:00</p>
+        <p>Location: Madison Square Garden, NY</p>
+    </div>
+    <div class="event-details">
+        <h2>Theater</h2>
+        <p>Date: 2024-08-20</p>
+        <p>Time: 20:00</p>
+        <p>Location: Broadway Theater, NY</p>
+    </div>
+    <div class="event-details">
+        <h2>Sports</h2>
+        <p>Date: 2024-08-25</p>
+        <p>Time: 22:00</p>
+        <p>Location: Yankee Stadium, NY</p>
+    </div>
 </div>
 
 <div class="container" id="contact" style="display: none;">
     <h1>Contact Us</h1>
-    <p>Contact details.</p>
-    <!-- Add contact details here -->
+    <div class="contact-info">
+        <h2>Customer Service</h2>
+        <p>Email: support@ticketbookingapp.com</p>
+        <p>Phone: +1 234 567 890</p>
+    </div>
+    <div class="contact-info">
+        <h2>Office Address</h2>
+        <p>123 Main Street, Suite 400</p>
+        <p>New York, NY 10001</p>
+    </div>
 </div>
 
 <div class="container" id="booking" style="display: none;">
@@ -220,32 +249,41 @@
         <h2>Step 4: Payment and Confirmation</h2>
         <form id="paymentDetailsForm">
             <label for="tickets">Number of Tickets:</label>
-            <input type="number" id="tickets" name="tickets" min="1" required oninput="calculateTotalCost()">
+            <input type="number" id="tickets" name="tickets" min="1" value="1" required oninput="calculateTotalCost()">
 
             <label for="payment">Payment Method:</label>
             <select id="payment" name="payment" required>
                 <option value="credit">Credit Card</option>
+                <option value="debit">Debit Card</option>
                 <option value="paypal">PayPal</option>
-                <option value="crypto">Cryptocurrency</option>
             </select>
 
-            <p><strong>Total Cost:</strong> $<span id="totalCost">0</span></p>
+            <div id="paymentDetails">
+                <label for="accountNumber">Account Number:</label>
+                <input type="text" id="accountNumber" name="accountNumber" required>
 
-            <button type="button" onclick="showModal()">Book Now</button>
+                <label for="pin">PIN:</label>
+                <input type="password" id="pin" name="pin" required>
+            </div>
+
+            <p>Total Cost: $<span id="totalCost">0</span></p>
+
+            <button type="button" onclick="showModal()">Confirm Booking</button>
         </form>
     </div>
+</div>
 
-    <div class="receipt" id="receipt">
-        <h2>Booking Receipt</h2>
-        <p><strong>Name:</strong> <span id="receiptName"></span></p>
-        <p><strong>Email:</strong> <span id="receiptEmail"></span></p>
-        <p><strong>Event:</strong> <span id="receiptEvent"></span></p>
-        <p><strong>Time:</strong> <span id="receiptTime"></span></p>
-        <p><strong>Number of Tickets:</strong> <span id="receiptTickets"></span></p>
-        <p><strong>Seats:</strong> <span id="receiptSeats"></span></p>
-        <p><strong>Payment Method:</strong> <span id="receiptPayment"></span></p>
-        <p><strong>Total Cost:</strong> $<span id="receiptCost"></span></p>
-    </div>
+<div class="container" id="receipt" style="display: none;">
+    <h1>Ticket Receipt</h1>
+    <p><strong>Name:</strong> <span id="receiptName"></span></p>
+    <p><strong>Email:</strong> <span id="receiptEmail"></span></p>
+    <p><strong>Event:</strong> <span id="receiptEvent"></span></p>
+    <p><strong>Time:</strong> <span id="receiptTime"></span></p>
+    <p><strong>Number of Tickets:</strong> <span id="receiptTickets"></span></p>
+    <p><strong>Selected Seats:</strong> <span id="receiptSeats"></span></p>
+    <p><strong>Payment Method:</strong> <span id="receiptPayment"></span></p>
+    <p><strong>Total Cost:</strong> $<span id="receiptCost"></span></p>
+    <button class="print-button" onclick="printReceipt()">Print Receipt</button>
 </div>
 
 <div id="myModal" class="modal">
@@ -304,6 +342,8 @@
         const tickets = document.getElementById('tickets').value;
         const selectedSeats = Array.from(document.querySelectorAll('.seat.selected')).map(seat => seat.innerText);
         const payment = document.getElementById('payment').value;
+        const accountNumber = document.getElementById('accountNumber').value;
+        const pin = document.getElementById('pin').value;
 
         const cost = tickets * 20 + selectedSeats.length * 5;
 
@@ -318,6 +358,10 @@
 
         document.getElementById('receipt').style.display = 'block';
         closeModal();
+    }
+
+    function printReceipt() {
+        window.print();
     }
 
     function goToStep2() {
@@ -377,4 +421,5 @@
 </script>
 
 </body>
-</html>
+    </html>
+    
